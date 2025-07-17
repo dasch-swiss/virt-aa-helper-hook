@@ -1,6 +1,9 @@
 package:
 	@cd "$$(make -s prepare)" && \
-	make -s create-package 
+	make -s create-package
+
+changelog:
+	@cd "$(CURDIR)/virt-aa-helper-hook" && make -s changelog
 
 changelog-update:
 	@cd "$$(make -s prepare)" && \
@@ -28,4 +31,7 @@ clean:
 prepare: clean
 	@mkdir -p "$(CURDIR)/build"
 	@cp -ra "$(CURDIR)/virt-aa-helper-hook" "$(CURDIR)/build/virt-aa-helper-hook"
-	@echo "$$(cd "$(CURDIR)/build/virt-aa-helper-hook" && make -s move-upstream)"
+	@cd "$(CURDIR)/build/virt-aa-helper-hook" && make -s move-upstream
+
+version:
+	@cd "$(CURDIR)/virt-aa-helper-hook" && make -s version

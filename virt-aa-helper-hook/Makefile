@@ -15,6 +15,9 @@ move-upstream:
 	mv "$(CURDIR)" "$$dir" && \
 	echo "$$dir"
 
+changelog:
+	@cd "$(CURDIR)" && dpkg-parsechangelog --file "debian/changelog"
+
 changelog-update:
 	@cd "$(CURDIR)" && dch --maintmaint --fromdirname
 
@@ -22,13 +25,16 @@ changelog-update-stdin:
 	@cd "$(CURDIR)" && text="$$(cat)" && dch --maintmaint --fromdirname "$$text"
 
 changelog-release:
-	@cd "$(CURDIR)" && dch --maintmaint --release 
+	@cd "$(CURDIR)" && dch --maintmaint --release
 
 changelog-release-stdin:
 	@cd "$(CURDIR)" && text="$$(cat)" && dch --maintmaint --release "$$text"
 
 create-orig-source:
-	@cd "$(CURDIR)" && tar -czf "../virt-aa-helper-hook_$(VERSION).orig.tar.gz" . 
+	@cd "$(CURDIR)" && tar -czf "../virt-aa-helper-hook_$(VERSION).orig.tar.gz" .
 
 create-package: create-orig-source
 	@cd "$(CURDIR)" && debuild -us -uc
+
+version:
+	@echo "$(VERSION)"

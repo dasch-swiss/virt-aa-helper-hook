@@ -1,0 +1,73 @@
+name: ci
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.metadata.outputs.version }}
+      changelog: ${{ steps.metadata.outputs.changelog }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install gcc build-essential devscripts debhelper dh-apparmor
+
+      - name: Create release changelog
+        run: echo | make changelog-release-stdin
+
+      - name: Build deb package
+        run: make package
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: |
+            build/*
+            !build/*/
+
+      - name: Output version and changelog
+        id: metadata
+        run: |
+          echo "version=$(make version)" >> "$GITHUB_OUTPUT"
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$(make changelog)" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+  release:
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    needs: build
+    steps:
+      - name: Check version
+        env:
+          tag: ${{ github.ref_name }}
+          version: ${{ needs.build.outputs.version }}
+        run: |
+          if [ "${tag:1}" != "$version" ]; then
+            echo "Tag '${tag:1}' does not match version '${version}'" >&2
+            exit 1
+          fi
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: build
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          body: ${{ needs.build.outputs.changelog }}
+          files: |
+            build/*
