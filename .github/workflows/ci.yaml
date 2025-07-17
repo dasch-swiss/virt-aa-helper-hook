@@ -1,0 +1,25 @@
+name: ci
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install gcc build-essential devscripts debhelper dh-apparmor
+
+      - name: Create release changelog
+        run: echo | make changelog-release-stdin
+
+      - name: Build deb package
+        run: make package
