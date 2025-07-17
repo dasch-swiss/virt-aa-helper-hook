@@ -1,0 +1,46 @@
+#!/bin/sh
+
+set -e
+
+libvirt_aa_helper_path='/usr/lib/libvirt/virt-aa-helper-unhooked'
+libvirt_aa_config_path='/etc/apparmor.d/libvirt'
+libvirt_aa_rules_regex='^\s*"[^"]\+"\s\+\([rwalkm]\|[pPcCuUi]\{0,3\}x\)\+,\s*$'
+
+xml="$(cat)"
+
+echo "$xml" | "$libvirt_aa_helper_path" "$@"
+
+unset run 
+unset dry
+unset uid
+
+while getopts ":crdu:" opt; do
+  case "${opt}" in
+    c|r)
+      run=1
+      ;;
+    d)
+      dry=1
+      ;;
+    u)
+      uid=${OPTARG}
+      ;;
+    *)
+      ;;
+    esac
+done
+
+if [ -n "$run" ] && [ -z "$dry" ] && [ -n "$uid" ]; then
+  aa_file="${libvirt_aa_config_path}/${uid}.files"
+  if [ -e "$aa_file" ]; then
+    echo "$xml" \
+    | "$libvirt_aa_helper_path" -d -r -u "$uid" 2>&1 \
+    | grep "$libvirt_aa_rules_regex" \
+    | while IFS= read -r rule; do
+        if ! grep -Fxq "$rule" "$aa_file"; then
+          echo "$rule" >> "$aa_file"
+        fi
+      done
+  fi
+fi
+

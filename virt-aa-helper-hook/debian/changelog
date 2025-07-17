@@ -1,0 +1,5 @@
+virt-aa-helper-hook (1.0-1ubuntu8) UNRELEASED; urgency=medium
+
+  * Initial release.
+
+ -- DaSCH <infra-team@dasch.swiss>  Thu, 17 Jul 2025 13:25:00 +0000

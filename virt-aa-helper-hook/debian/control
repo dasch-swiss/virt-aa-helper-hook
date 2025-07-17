@@ -1,0 +1,13 @@
+Source: virt-aa-helper-hook
+Maintainer: DaSCH <infra-team@dasch.swiss>
+Section: misc
+Priority: optional
+Standards-Version: 4.7.0
+Build-Depends: debhelper-compat (= 13), dh-apparmor
+
+Package: virt-aa-helper-hook
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Hook for virt-aa-helper
+ This tool hooks into libvirtd and virt-aa-helper to enhance the automatic
+ configuration of AppArmor profiles.

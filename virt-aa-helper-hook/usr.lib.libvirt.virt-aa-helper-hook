@@ -1,0 +1,15 @@
+#include <tunables/global>
+
+@{hextet}=[0-9a-f][0-9a-f][0-9a-f][0-9a-f]
+@{UUID}=@{hextet}@{hextet}-@{hextet}-@{hextet}-@{hextet}-@{hextet}@{hextet}@{hextet}
+
+profile virt-aa-helper-hook /usr/lib/libvirt/virt-aa-helper-hook {
+  #include <abstractions/base>
+  #include <abstractions/bash>
+
+  /usr/bin/* rmix,
+
+  /usr/lib/libvirt/virt-aa-helper Px,
+
+  /etc/apparmor.d/libvirt/libvirt-@{UUID}* rw,
+}
