@@ -5,10 +5,15 @@
 
 profile virt-aa-helper-hook /usr/lib/libvirt/virt-aa-helper-hook {
   #include <abstractions/base>
-  #include <abstractions/bash>
 
-  /usr/bin/* rmix,
+  # Shell
+  /{,usr/}bin/{bash,dash} rmix,
 
+  # Rust uutils have different paths than GNU coreutils (see LaunchPad #2123870)
+  /{bin/,usr/bin/,usr/bin/gnu,usr/lib/cargo/bin/coreutils/}{cat,grep,getopt} rmix,
+  /usr/share/coreutils/locales/** r,
+
+  # The real virt-aa-helper called by the hook script via symlink
   /usr/lib/libvirt/virt-aa-helper Px,
 
   /etc/apparmor.d/libvirt/libvirt-@{UUID}* rw,
