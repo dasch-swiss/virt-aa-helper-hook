@@ -1,4 +1,11 @@
-virt-aa-helper-hook (1.0-1) UNRELEASED; urgency=medium
+virt-aa-helper-hook (1.1-1) resolute; urgency=medium
+
+  * Adapt AppArmor profile to Ubuntu 26 / rust uutils.
+  * Reliability improvements.
+
+ -- DaSCH <infra-team@dasch.swiss>  Fri, 02 Oct 2026 15:44:56 +0000
+
+virt-aa-helper-hook (1.0-1) noble; urgency=medium
 
   * Initial release.
 

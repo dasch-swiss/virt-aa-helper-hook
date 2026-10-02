@@ -6,41 +6,59 @@ libvirt_aa_helper_path='/usr/lib/libvirt/virt-aa-helper-unhooked'
 libvirt_aa_config_path='/etc/apparmor.d/libvirt'
 libvirt_aa_rules_regex='^\s*"[^"]\+"\s\+\([rwalkm]\|[pPcCuUi]\{0,3\}x\)\+,\s*$'
 
-xml="$(cat)"
+opts=$(/usr/bin/getopt -n "virt-aa-helper-hook" -o acDrRdu:hf:F: --long add,create,delete,replace,remove,dryrun,uuid:,help,add-file:,append-file: -- "$@")
 
-echo "$xml" | "$libvirt_aa_helper_path" "$@"
+xml="$(/usr/bin/cat)"
 
-unset run 
+printf '%s' "$xml" | "$libvirt_aa_helper_path" "$@"
+
+unset run
 unset dry
 unset uid
 
-while getopts ":crdu:" opt; do
-  case "${opt}" in
-    c|r)
+eval set -- "$opts"
+
+while true; do
+  case "$1" in
+    -c|--create|-r|--replace)
       run=1
+      shift
       ;;
-    d)
+    -d|--dryrun)
       dry=1
+      shift
       ;;
-    u)
-      uid=${OPTARG}
+    -u|--uuid)
+      uid="${2}"
+      shift 2
+      ;;
+    -a|--add|-D|--delete|-R|--remove|-h|--help)
+      shift
+      ;;
+    -f|--add-file|-F|--append-file)
+      shift 2
+      ;;
+    --)
+      shift
+      break
       ;;
     *)
+      echo "unknown argument: $1" >&2
+      exit 1
       ;;
-    esac
+  esac
 done
 
 if [ -n "$run" ] && [ -z "$dry" ] && [ -n "$uid" ]; then
   aa_file="${libvirt_aa_config_path}/${uid}.files"
   if [ -e "$aa_file" ]; then
-    echo "$xml" \
+    printf '%s' "$xml" \
     | "$libvirt_aa_helper_path" -d -r -u "$uid" 2>&1 \
-    | grep "$libvirt_aa_rules_regex" \
+    | /usr/bin/grep "$libvirt_aa_rules_regex" \
     | while IFS= read -r rule; do
-        if ! grep -Fxq "$rule" "$aa_file"; then
-          echo "$rule" >> "$aa_file"
+        if ! /usr/bin/grep -Fxq "$rule" "$aa_file"; then
+          printf '%s\n' "$rule" >> "$aa_file"
         fi
       done
   fi
 fi
-
