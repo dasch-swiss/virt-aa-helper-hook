@@ -1,4 +1,4 @@
-VERSION = 1.0
+VERSION = 1.1
 
 build:
 	gcc -Wall -fPIC -shared -o "$(CURDIR)/virt-aa-helper-hook.so" "$(CURDIR)/virt-aa-helper-hook.c" -ldl
