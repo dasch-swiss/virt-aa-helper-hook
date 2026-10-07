@@ -1,3 +1,10 @@
+virt-aa-helper-hook (1.2-1) resolute; urgency=medium
+
+  * Don't pass LD_PRELOAD to child processes (e.g. QEMU).
+  * Minor AppArmor profile hardening.
+
+ -- DaSCH <infra-team@dasch.swiss>  Wed, 07 Oct 2026 14:43:34 +0000
+
 virt-aa-helper-hook (1.1-1) resolute; urgency=medium
 
   * Adapt AppArmor profile to Ubuntu 26 / rust uutils.

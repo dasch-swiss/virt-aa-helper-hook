@@ -16,5 +16,6 @@ profile virt-aa-helper-hook /usr/lib/libvirt/virt-aa-helper-hook {
   # The real virt-aa-helper called by the hook script via symlink
   /usr/lib/libvirt/virt-aa-helper Px,
 
-  /etc/apparmor.d/libvirt/libvirt-@{UUID}* rw,
+  # The per-domain rules file the hook appends to
+  /etc/apparmor.d/libvirt/libvirt-@{UUID}.files rw,
 }
